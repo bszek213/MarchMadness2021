@@ -6,6 +6,7 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.model_selection import train_test_split
 import sys
+from sklearn.preprocessing import StandardScaler
 
 # Count the arguments
 arguments = len(sys.argv) - 1
@@ -168,7 +169,10 @@ X1 = df_final_season[['overtimes','points_against',
 y1 = df_final_season['Class']
 X_train, X_test, y_train, y_test = train_test_split(X, y)
 X_train_season, X_test_season, y_train_season, y_test_season = train_test_split(X1, y1)
-
+#standarized data
+sc = StandardScaler()
+X_train = sc.fit_transform(X_train)
+X_test = sc.transform(X_test)
 #random forest regressor
 parameters = {'bootstrap': True,
               'min_samples_leaf': 3,
@@ -186,12 +190,17 @@ model = RandomForestRegressor(**parameters)
 model.fit(X_train, y_train)
 model_boost.fit(X_train, y_train)
 
+if y_test.astype(int).array == 0:
+    team_test = team1.abbreviation
+else:
+    team_test = team2.abbreviation
+
 #model_season.fit(X_train_season, y_train_season)
 #model_boost_season.fit(X_train_season, y_train_season)
 if model.predict(X_test) == 0:
-    print(team1.abbreviation + " wins RandomForestRegressor")
+    print(team_test + " loses RandomForestRegressor")
 else:
-     print(team2.abbreviation + " wins RandomForestRegressor")
+     print(team_test + " wins RandomForestRegressor")
 if model_boost.predict(X_test) == 0:
     print(team1.abbreviation + " wins GradientBoostingRegressor")
 else:
