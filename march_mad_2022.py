@@ -127,8 +127,10 @@ class marchMad:
         df_team2_update = df_team2.drop(columns=['game_result']).median().to_frame().T
         df_final = df_team1_update.append(df_team2_update)
         proba_team = self.model_save.predict_proba(df_final)
+        print('========================================================================================================')
         print(f'probability of {self.args.team1} winning is {int(proba_team[0][1])}, losing is {int(proba_team[0][0])}')
         print(f'probability of {self.args.team2} winning is {int(proba_team[1][1])}, losing is {int(proba_team[1][0])}')
+        print('========================================================================================================')
 if __name__ == '__main__':
     start_time = time.time()
     mad = marchMad()
