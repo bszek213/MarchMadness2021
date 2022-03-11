@@ -123,13 +123,28 @@ class marchMad:
         team2_str = 'https://www.sports-reference.com/cbb/schools/' + self.args.team2.lower() + '/2022-gamelogs.html'
         df_team1 = html_to_df_web_scrape(team1_str)
         df_team2 = html_to_df_web_scrape(team2_str)
-        df_team1_update = df_team1.drop(columns=['game_result']).median().to_frame().T
-        df_team2_update = df_team2.drop(columns=['game_result']).median().to_frame().T
+        
+        df_team1['game_result'].loc[df_team1['game_result'].str.contains('W')] = 'W'
+        df_team1['game_result'].loc[df_team1['game_result'].str.contains('L')] = 'L'
+        df_team1['game_result'] = df_team1['game_result'].replace({'W': 1, 'L': 0})
+        df_team1_final = df_team1.replace(r'^\s*$', np.NaN, regex=True)
+        df_team2['game_result'].loc[df_team2['game_result'].str.contains('W')] = 'W'
+        df_team2['game_result'].loc[df_team2['game_result'].str.contains('L')] = 'L'
+        df_team2['game_result'] = df_team2['game_result'].replace({'W': 1, 'L': 0})
+        df_team2_final = df_team2.replace(r'^\s*$', np.NaN, regex=True)
+        
+        df_team1_update = df_team1_final.drop(columns=['game_result']).median().to_frame().T
+        df_team2_update = df_team2_final.drop(columns=['game_result']).median().to_frame().T
         df_final = df_team1_update.append(df_team2_update)
         proba_team = self.model_save.predict_proba(df_final)
+        predict_team1 = self.model_save.predict(df_team1_update)
+        predict_team2 = self.model_save.predict(df_team2_update)
         print('========================================================================================================')
-        print(f'probability of {self.args.team1} winning is {int(proba_team[0][1])}, losing is {int(proba_team[0][0])}')
-        print(f'probability of {self.args.team2} winning is {int(proba_team[1][1])}, losing is {int(proba_team[1][0])}')
+        print(f'probability of {self.args.team1} winning is {float(proba_team[0][1])}, losing is {float(proba_team[0][0])}')
+        print(f'probability of {self.args.team2} winning is {float(proba_team[1][1])}, losing is {float(proba_team[1][0])}')
+        print('========================================================================================================')
+        print(f'prediction of {self.args.team1} winning is {predict_team1}')
+        print(f'prediction of {self.args.team2} winning is {predict_team2}')
         print('========================================================================================================')
 if __name__ == '__main__':
     start_time = time.time()
