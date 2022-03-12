@@ -138,6 +138,7 @@ class marchMad:
                 team_2 = input('team 2 input: ')
                 if team_2 == "exit":
                     break
+                game_input = input('number of games to look over (all or int input): ')
                 team1_str = 'https://www.sports-reference.com/cbb/schools/' + team_1 + '/2022-gamelogs.html' #self.args.team1.lower()
                 team2_str = 'https://www.sports-reference.com/cbb/schools/' + team_2 + '/2022-gamelogs.html' #self.args.team2.lower()
                 df_team1 = html_to_df_web_scrape(team1_str)
@@ -165,12 +166,12 @@ class marchMad:
                 # df_team1_update = df_team1_final_scale.drop(columns=self.drop_cols).iloc[-10:].median(axis = 0, skipna = True).to_frame().T
                 # df_team2_update = df_team2_final_scale.drop(columns=self.drop_cols).iloc[-10:].median(axis = 0, skipna = True).to_frame().T
                 ####################10 games seems to be the best###########
-                if self.args.games == 'all':
+                if game_input == 'all':
                     df_team1_update = df_team1_final.drop(columns=self.drop_cols).median(axis = 0, skipna = True).to_frame().T
                     df_team2_update = df_team2_final.drop(columns=self.drop_cols).median(axis = 0, skipna = True).to_frame().T
                     df_final = df_team1_update.append(df_team2_update)
                 else:
-                    game_num = int(self.args.games)
+                    game_num = int(game_input) #int(self.args.games)
                     df_team1_update = df_team1_final.drop(columns=self.drop_cols).iloc[-game_num:].median(axis = 0, skipna = True).to_frame().T
                     df_team2_update = df_team2_final.drop(columns=self.drop_cols).iloc[-game_num:].median(axis = 0, skipna = True).to_frame().T
                     df_final = df_team1_update.append(df_team2_update)
