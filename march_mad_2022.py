@@ -161,14 +161,32 @@ class marchMad:
         print(df_final)
         
         proba_team = self.model_save.predict_proba(df_final)
-        predict_team1 = self.model_save.predict(df_team1_update)
-        predict_team2 = self.model_save.predict(df_team2_update)
         print('========================================================================================================')
         print(f'probability of {self.args.team1} winning is {float(proba_team[0][1])}, losing is {float(proba_team[0][0])}')
         print(f'probability of {self.args.team2} winning is {float(proba_team[1][1])}, losing is {float(proba_team[1][0])}')
         print('========================================================================================================')
-        print(f'prediction of {self.args.team1} winning is {predict_team1}')
-        print(f'prediction of {self.args.team2} winning is {predict_team2}')
+        
+        team1_np =df_team1_update.to_numpy()
+        team2_np =df_team2_update.to_numpy()
+
+        diff = [a - b for a, b in zip(team1_np, team2_np)]
+        arr = np.array(diff)
+        nx, ny = arr.shape
+        final_vector = arr.reshape((1,nx*ny))
+        
+        diff = [b - a for a, b in zip(team1_np, team2_np)]
+        arr = np.array(diff)
+        nx, ny = arr.shape
+        final_vector2 = arr.reshape((1,nx*ny))
+        
+        cols = df_team1_update.columns
+        final_vect_df1 = pd.DataFrame(final_vector, columns = cols)
+        final_vect_df2 = pd.DataFrame(final_vector2, columns = cols)
+        proba_team1 = self.model_save.predict_proba(final_vect_df1)
+        proba_team2 = self.model_save.predict_proba(final_vect_df2)
+        print('========================================================================================================')
+        print('Probability that ' + self.args.team1 + ' wins:', proba_team1[0][1])
+        print('Probability that ' + self.args.team2 + ' wins:', proba_team2[0][1])
         print('========================================================================================================')
         
     def plot_feature_importances(self):
