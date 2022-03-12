@@ -13,8 +13,9 @@ from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import LogisticRegression
 # from sklearn.gaussian_process import GaussianProcessClassifier
+# from sklearn.linear_model import Perceptron
 from sklearn.neural_network import MLPClassifier
-# from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import MinMaxScaler
 # from sklearn.decomposition import PCA
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split#,RandomizedSearchCV
@@ -58,9 +59,10 @@ class marchMad:
         self.drop_cols = ['game_result', 'fta', 'ft_pct', 'fga', 'opp_orb', 'orb', 'opp_fta', 'blk', 'opp_fg_pct']
         y = self.all_data['game_result']
         x = self.all_data.drop(columns=self.drop_cols)
+        # x_data = self.all_data.drop(columns=self.drop_cols)
         # scaler = MinMaxScaler()
-        # scaled_data = scaler.fit_transform(temp_df)
-        # cols = temp_df.columns
+        # scaled_data = scaler.fit_transform(x_data)
+        # cols = x_data.columns
         # x = pd.DataFrame(scaled_data, columns = cols)
         self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(x,y, train_size=0.8)
 
@@ -107,18 +109,25 @@ class marchMad:
         print(highest_acc)
         if highest_acc == 0:
             self.model_save = Gradclass
+            self.name = 'Gradclass'
         if highest_acc == 1:
             self.model_save = RandForclass
+            self.name = 'RandForclass'
         if highest_acc == 2:
             self.model_save = DecTreeclass
+            self.name = 'DecTreeclass'
         if highest_acc == 3:
-            self.model_save = SVC
+            self.model_save = SVCclass
+            self.name = 'SVCclass'
         if highest_acc == 4:
             self.model_save = LogReg
+            self.name = 'LogReg'
         if highest_acc == 5:
             self.model_save = MLPClass
+            self.name = 'MLPClass'
         if highest_acc == 6:
             self.model_save = KClass
+            self.name = 'KClass'
     def compare_two_teams(self):
         team1_str = 'https://www.sports-reference.com/cbb/schools/' + self.args.team1.lower() + '/2022-gamelogs.html'
         team2_str = 'https://www.sports-reference.com/cbb/schools/' + self.args.team2.lower() + '/2022-gamelogs.html'
@@ -133,7 +142,19 @@ class marchMad:
         df_team2['game_result'].loc[df_team2['game_result'].str.contains('L')] = 'L'
         df_team2['game_result'] = df_team2['game_result'].replace({'W': 1, 'L': 0})
         df_team2_final = df_team2.replace(r'^\s*$', np.NaN, regex=True)
-
+        
+        # scaler = MinMaxScaler()
+        # scaled_data = scaler.fit_transform(df_team1_final)
+        # cols = df_team1_final.columns
+        # df_team1_final_scale = pd.DataFrame(scaled_data, columns = cols)
+        
+        # scaler2 = MinMaxScaler()
+        # scaled_data2 = scaler2.fit_transform(df_team2_final)
+        # cols = df_team2_final.columns
+        # df_team2_final_scale = pd.DataFrame(scaled_data2, columns = cols)
+        
+        # df_team1_update = df_team1_final_scale.drop(columns=self.drop_cols).iloc[-10:].median(axis = 0, skipna = True).to_frame().T
+        # df_team2_update = df_team2_final_scale.drop(columns=self.drop_cols).iloc[-10:].median(axis = 0, skipna = True).to_frame().T
         df_team1_update = df_team1_final.drop(columns=self.drop_cols).iloc[-10:].median(axis = 0, skipna = True).to_frame().T
         df_team2_update = df_team2_final.drop(columns=self.drop_cols).iloc[-10:].median(axis = 0, skipna = True).to_frame().T
         df_final = df_team1_update.append(df_team2_update)
@@ -151,13 +172,16 @@ class marchMad:
         print('========================================================================================================')
         
     def plot_feature_importances(self):
-        feature_imp = pd.Series(np.abs(self.model_save.coef_[0]),index=self.x_test.columns).sort_values(ascending=False) #feature_importances_
-        plot1 = plt.figure(1)
-        sns.barplot(x=feature_imp,y=feature_imp.index)
-        plt.xlabel('Feature Importance')
-        plt.ylabel('Features')
-        plt.title('NCAA MENS BASKETBALL')
-        plt.savefig('feature_importances.png')
+        if self.name == 'LogReg':
+            feature_imp = pd.Series(np.abs(self.model_save.coef_[0]),index=self.x_test.columns).sort_values(ascending=False) #feature_importances_
+            plot1 = plt.figure(1)
+            sns.barplot(x=feature_imp,y=feature_imp.index)
+            plt.xlabel('Feature Importance')
+            plt.ylabel('Features')
+            plt.title('NCAA MENS BASKETBALL')
+            plt.savefig('feature_importances.png')
+        # if self.name == 'MLPClass':
+        #     feature_imp = pd.Series(np.abs(self.model_save.coefs_),index=self.x_test.columns).sort_values(ascending=False) #feature_importances_
 
 if __name__ == '__main__':
     start_time = time.time()
