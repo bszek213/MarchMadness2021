@@ -172,8 +172,8 @@ class marchMad:
             
             proba_team = self.model_save.predict_proba(df_final)
             print('========================================================================================================')
-            print(f'probability of {self.args.team1} winning is {float(proba_team[0][1])}, losing is {float(proba_team[0][0])}')
-            print(f'probability of {self.args.team2} winning is {float(proba_team[1][1])}, losing is {float(proba_team[1][0])}')
+            print(f'probability of {team_1} winning is {float(proba_team[0][1])}, losing is {float(proba_team[0][0])}')
+            print(f'probability of {team_2} winning is {float(proba_team[1][1])}, losing is {float(proba_team[1][0])}')
             print('========================================================================================================')
             
             team1_np =df_team1_update.to_numpy()
@@ -195,8 +195,8 @@ class marchMad:
             proba_team1 = self.model_save.predict_proba(final_vect_df1)
             proba_team2 = self.model_save.predict_proba(final_vect_df2)
             print('========================================================================================================')
-            print('Probability that ' + self.args.team1 + ' wins:', proba_team1[0][1])
-            print('Probability that ' + self.args.team2 + ' wins:', proba_team2[0][1])
+            print('Probability that ' + team_1 + ' wins:', proba_team1[0][1])
+            print('Probability that ' + team_2 + ' wins:', proba_team2[0][1])
             print('========================================================================================================')
         
     def plot_feature_importances(self):
