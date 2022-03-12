@@ -55,7 +55,7 @@ class marchMad:
         self.all_data.to_csv('all_data.csv')
         
     def split(self):
-        self.drop_cols = ['game_result', 'fta', 'ft_pct', 'fga', 'opp_orb', 'orb', 'opp_fta']
+        self.drop_cols = ['game_result', 'fta', 'ft_pct', 'fga', 'opp_orb', 'orb', 'opp_fta', 'blk', 'opp_fg_pct']
         y = self.all_data['game_result']
         x = self.all_data.drop(columns=self.drop_cols)
         # scaler = MinMaxScaler()
@@ -157,7 +157,7 @@ class marchMad:
         plt.xlabel('Feature Importance')
         plt.ylabel('Features')
         plt.title('NCAA MENS BASKETBALL')
-        plt.show()
+        plt.savefig('feature_importances.png')
 
 if __name__ == '__main__':
     start_time = time.time()
