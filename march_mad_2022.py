@@ -34,6 +34,7 @@ class marchMad:
         parser = argparse.ArgumentParser()
         parser.add_argument("-t1", "--team1", help = "team 1 input")
         parser.add_argument("-t2", "--team2", help = "team 2 input")
+        parser.add_argument("-g", "--games", help = "number of games for test data")
         self.args = parser.parse_args()
         
     def get_teams(self, year):
@@ -129,65 +130,73 @@ class marchMad:
             self.model_save = KClass
             self.name = 'KClass'
     def compare_two_teams(self):
-        team1_str = 'https://www.sports-reference.com/cbb/schools/' + self.args.team1.lower() + '/2022-gamelogs.html'
-        team2_str = 'https://www.sports-reference.com/cbb/schools/' + self.args.team2.lower() + '/2022-gamelogs.html'
-        df_team1 = html_to_df_web_scrape(team1_str)
-        df_team2 = html_to_df_web_scrape(team2_str)
-        
-        df_team1['game_result'].loc[df_team1['game_result'].str.contains('W')] = 'W'
-        df_team1['game_result'].loc[df_team1['game_result'].str.contains('L')] = 'L'
-        df_team1['game_result'] = df_team1['game_result'].replace({'W': 1, 'L': 0})
-        df_team1_final = df_team1.replace(r'^\s*$', np.NaN, regex=True)
-        df_team2['game_result'].loc[df_team2['game_result'].str.contains('W')] = 'W'
-        df_team2['game_result'].loc[df_team2['game_result'].str.contains('L')] = 'L'
-        df_team2['game_result'] = df_team2['game_result'].replace({'W': 1, 'L': 0})
-        df_team2_final = df_team2.replace(r'^\s*$', np.NaN, regex=True)
-        
-        # scaler = MinMaxScaler()
-        # scaled_data = scaler.fit_transform(df_team1_final)
-        # cols = df_team1_final.columns
-        # df_team1_final_scale = pd.DataFrame(scaled_data, columns = cols)
-        
-        # scaler2 = MinMaxScaler()
-        # scaled_data2 = scaler2.fit_transform(df_team2_final)
-        # cols = df_team2_final.columns
-        # df_team2_final_scale = pd.DataFrame(scaled_data2, columns = cols)
-        
-        # df_team1_update = df_team1_final_scale.drop(columns=self.drop_cols).iloc[-10:].median(axis = 0, skipna = True).to_frame().T
-        # df_team2_update = df_team2_final_scale.drop(columns=self.drop_cols).iloc[-10:].median(axis = 0, skipna = True).to_frame().T
-        df_team1_update = df_team1_final.drop(columns=self.drop_cols).iloc[-10:].median(axis = 0, skipna = True).to_frame().T
-        df_team2_update = df_team2_final.drop(columns=self.drop_cols).iloc[-10:].median(axis = 0, skipna = True).to_frame().T
-        df_final = df_team1_update.append(df_team2_update)
-        print(df_final)
-        
-        proba_team = self.model_save.predict_proba(df_final)
-        print('========================================================================================================')
-        print(f'probability of {self.args.team1} winning is {float(proba_team[0][1])}, losing is {float(proba_team[0][0])}')
-        print(f'probability of {self.args.team2} winning is {float(proba_team[1][1])}, losing is {float(proba_team[1][0])}')
-        print('========================================================================================================')
-        
-        team1_np =df_team1_update.to_numpy()
-        team2_np =df_team2_update.to_numpy()
-
-        diff = [a - b for a, b in zip(team1_np, team2_np)]
-        arr = np.array(diff)
-        nx, ny = arr.shape
-        final_vector = arr.reshape((1,nx*ny))
-        
-        diff = [b - a for a, b in zip(team1_np, team2_np)]
-        arr = np.array(diff)
-        nx, ny = arr.shape
-        final_vector2 = arr.reshape((1,nx*ny))
-        
-        cols = df_team1_update.columns
-        final_vect_df1 = pd.DataFrame(final_vector, columns = cols)
-        final_vect_df2 = pd.DataFrame(final_vector2, columns = cols)
-        proba_team1 = self.model_save.predict_proba(final_vect_df1)
-        proba_team2 = self.model_save.predict_proba(final_vect_df2)
-        print('========================================================================================================')
-        print('Probability that ' + self.args.team1 + ' wins:', proba_team1[0][1])
-        print('Probability that ' + self.args.team2 + ' wins:', proba_team2[0][1])
-        print('========================================================================================================')
+        while True:
+            team_1 = input('team 1 input: ')
+            if team_1 == "exit":
+                break
+            team_2 = input('team 2 input: ')
+            if team_2 == "exit":
+                break
+            team1_str = 'https://www.sports-reference.com/cbb/schools/' + team_1 + '/2022-gamelogs.html' #self.args.team1.lower()
+            team2_str = 'https://www.sports-reference.com/cbb/schools/' + team_2 + '/2022-gamelogs.html' #self.args.team2.lower()
+            df_team1 = html_to_df_web_scrape(team1_str)
+            df_team2 = html_to_df_web_scrape(team2_str)
+            
+            df_team1['game_result'].loc[df_team1['game_result'].str.contains('W')] = 'W'
+            df_team1['game_result'].loc[df_team1['game_result'].str.contains('L')] = 'L'
+            df_team1['game_result'] = df_team1['game_result'].replace({'W': 1, 'L': 0})
+            df_team1_final = df_team1.replace(r'^\s*$', np.NaN, regex=True)
+            df_team2['game_result'].loc[df_team2['game_result'].str.contains('W')] = 'W'
+            df_team2['game_result'].loc[df_team2['game_result'].str.contains('L')] = 'L'
+            df_team2['game_result'] = df_team2['game_result'].replace({'W': 1, 'L': 0})
+            df_team2_final = df_team2.replace(r'^\s*$', np.NaN, regex=True)
+            
+            # scaler = MinMaxScaler()
+            # scaled_data = scaler.fit_transform(df_team1_final)
+            # cols = df_team1_final.columns
+            # df_team1_final_scale = pd.DataFrame(scaled_data, columns = cols)
+            
+            # scaler2 = MinMaxScaler()
+            # scaled_data2 = scaler2.fit_transform(df_team2_final)
+            # cols = df_team2_final.columns
+            # df_team2_final_scale = pd.DataFrame(scaled_data2, columns = cols)
+            
+            # df_team1_update = df_team1_final_scale.drop(columns=self.drop_cols).iloc[-10:].median(axis = 0, skipna = True).to_frame().T
+            # df_team2_update = df_team2_final_scale.drop(columns=self.drop_cols).iloc[-10:].median(axis = 0, skipna = True).to_frame().T
+            ####################10 games seems to be the best###########
+            df_team1_update = df_team1_final.drop(columns=self.drop_cols).iloc[-self.args.games:].median(axis = 0, skipna = True).to_frame().T
+            df_team2_update = df_team2_final.drop(columns=self.drop_cols).iloc[-self.args.games:].median(axis = 0, skipna = True).to_frame().T
+            df_final = df_team1_update.append(df_team2_update)
+            print(df_final)
+            
+            proba_team = self.model_save.predict_proba(df_final)
+            print('========================================================================================================')
+            print(f'probability of {self.args.team1} winning is {float(proba_team[0][1])}, losing is {float(proba_team[0][0])}')
+            print(f'probability of {self.args.team2} winning is {float(proba_team[1][1])}, losing is {float(proba_team[1][0])}')
+            print('========================================================================================================')
+            
+            team1_np =df_team1_update.to_numpy()
+            team2_np =df_team2_update.to_numpy()
+    
+            diff = [a - b for a, b in zip(team1_np, team2_np)]
+            arr = np.array(diff)
+            nx, ny = arr.shape
+            final_vector = arr.reshape((1,nx*ny))
+            
+            diff = [b - a for a, b in zip(team1_np, team2_np)]
+            arr = np.array(diff)
+            nx, ny = arr.shape
+            final_vector2 = arr.reshape((1,nx*ny))
+            
+            cols = df_team1_update.columns
+            final_vect_df1 = pd.DataFrame(final_vector, columns = cols)
+            final_vect_df2 = pd.DataFrame(final_vector2, columns = cols)
+            proba_team1 = self.model_save.predict_proba(final_vect_df1)
+            proba_team2 = self.model_save.predict_proba(final_vect_df2)
+            print('========================================================================================================')
+            print('Probability that ' + self.args.team1 + ' wins:', proba_team1[0][1])
+            print('Probability that ' + self.args.team2 + ' wins:', proba_team2[0][1])
+            print('========================================================================================================')
         
     def plot_feature_importances(self):
         if self.name == 'LogReg':
