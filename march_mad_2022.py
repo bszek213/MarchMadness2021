@@ -164,10 +164,15 @@ class marchMad:
             # df_team1_update = df_team1_final_scale.drop(columns=self.drop_cols).iloc[-10:].median(axis = 0, skipna = True).to_frame().T
             # df_team2_update = df_team2_final_scale.drop(columns=self.drop_cols).iloc[-10:].median(axis = 0, skipna = True).to_frame().T
             ####################10 games seems to be the best###########
-            game_num = int(self.args.games)
-            df_team1_update = df_team1_final.drop(columns=self.drop_cols).iloc[-game_num:].median(axis = 0, skipna = True).to_frame().T
-            df_team2_update = df_team2_final.drop(columns=self.drop_cols).iloc[-game_num:].median(axis = 0, skipna = True).to_frame().T
-            df_final = df_team1_update.append(df_team2_update)
+            if self.args.games == 'all':
+                df_team1_update = df_team1_final.drop(columns=self.drop_cols).median(axis = 0, skipna = True).to_frame().T
+                df_team2_update = df_team2_final.drop(columns=self.drop_cols).median(axis = 0, skipna = True).to_frame().T
+                df_final = df_team1_update.append(df_team2_update)
+            else:
+                game_num = int(self.args.games)
+                df_team1_update = df_team1_final.drop(columns=self.drop_cols).iloc[-game_num:].median(axis = 0, skipna = True).to_frame().T
+                df_team2_update = df_team2_final.drop(columns=self.drop_cols).iloc[-game_num:].median(axis = 0, skipna = True).to_frame().T
+                df_final = df_team1_update.append(df_team2_update)
             print(df_final)
             
             proba_team = self.model_save.predict_proba(df_final)
