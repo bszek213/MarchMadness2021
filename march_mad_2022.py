@@ -55,8 +55,9 @@ class marchMad:
         self.all_data.to_csv('all_data.csv')
         
     def split(self):
+        self.drop_cols = ['game_result', 'fta', 'ft_pct', 'fga', 'opp_orb', 'orb', 'opp_fta']
         y = self.all_data['game_result']
-        x = self.all_data.drop(columns=['game_result'])
+        x = self.all_data.drop(columns=self.drop_cols)
         # scaler = MinMaxScaler()
         # scaled_data = scaler.fit_transform(temp_df)
         # cols = temp_df.columns
@@ -76,7 +77,7 @@ class marchMad:
         SVCclass = SVC()
         SVCclass.fit(self.x_train,self.y_train)
         
-        LogReg = LogisticRegression()
+        LogReg = LogisticRegression(max_iter=500)
         LogReg.fit(self.x_train,self.y_train)
         
         MLPClass = MLPClassifier()
@@ -132,10 +133,12 @@ class marchMad:
         df_team2['game_result'].loc[df_team2['game_result'].str.contains('L')] = 'L'
         df_team2['game_result'] = df_team2['game_result'].replace({'W': 1, 'L': 0})
         df_team2_final = df_team2.replace(r'^\s*$', np.NaN, regex=True)
-        
-        df_team1_update = df_team1_final.drop(columns=['game_result']).median().to_frame().T
-        df_team2_update = df_team2_final.drop(columns=['game_result']).median().to_frame().T
+
+        df_team1_update = df_team1_final.drop(columns=self.drop_cols).iloc[-10:].median(axis = 0, skipna = True).to_frame().T
+        df_team2_update = df_team2_final.drop(columns=self.drop_cols).iloc[-10:].median(axis = 0, skipna = True).to_frame().T
         df_final = df_team1_update.append(df_team2_update)
+        print(df_final)
+        
         proba_team = self.model_save.predict_proba(df_final)
         predict_team1 = self.model_save.predict(df_team1_update)
         predict_team2 = self.model_save.predict(df_team2_update)
@@ -146,6 +149,16 @@ class marchMad:
         print(f'prediction of {self.args.team1} winning is {predict_team1}')
         print(f'prediction of {self.args.team2} winning is {predict_team2}')
         print('========================================================================================================')
+        
+    def plot_feature_importances(self):
+        feature_imp = pd.Series(np.abs(self.model_save.coef_[0]),index=self.x_test.columns).sort_values(ascending=False) #feature_importances_
+        plot1 = plt.figure(1)
+        sns.barplot(x=feature_imp,y=feature_imp.index)
+        plt.xlabel('Feature Importance')
+        plt.ylabel('Features')
+        plt.title('NCAA MENS BASKETBALL')
+        plt.show()
+
 if __name__ == '__main__':
     start_time = time.time()
     mad = marchMad()
@@ -154,4 +167,5 @@ if __name__ == '__main__':
     mad.split()
     mad.machine()
     mad.compare_two_teams()
+    mad.plot_feature_importances()
     print("--- %s seconds ---" % (time.time() - start_time))
