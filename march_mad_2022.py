@@ -167,10 +167,10 @@ class marchMad:
                 # df_team2_update = df_team2_final_scale.drop(columns=self.drop_cols).iloc[-10:].median(axis = 0, skipna = True).to_frame().T
                 ####################10 games seems to be the best###########
                 # if game_input == 'all':
-                #ALL CONDITITION
-                df_team1_update_all = df_team1_final.drop(columns=self.drop_cols).median(axis = 0, skipna = True).to_frame().T
-                df_team2_update_all = df_team2_final.drop(columns=self.drop_cols).median(axis = 0, skipna = True).to_frame().T
-                df_final_all = df_team1_update_all.append(df_team2_update_all)
+                #7 game CONDITITION
+                df_team1_update_7 = df_team1_final.drop(columns=self.drop_cols).iloc[-7:].median(axis = 0, skipna = True).to_frame().T
+                df_team2_update_7 = df_team2_final.drop(columns=self.drop_cols).iloc[-7:].median(axis = 0, skipna = True).to_frame().T
+                df_final_7 = df_team1_update_7.append(df_team2_update_7)
                 # else:
                     # game_num = int(game_input) #int(self.args.games)
                 #HEAT INDEX - 3 games
@@ -196,9 +196,9 @@ class marchMad:
                 # print(f'probability of {team_1} winning is {float(proba_team[0][1])}, losing is {float(proba_team[0][0])}')
                 # print(f'probability of {team_2} winning is {float(proba_team[1][1])}, losing is {float(proba_team[1][0])}')
                 # print('========================================================================================================')
-                # ALL CONDITION #
-                team1_np =df_team1_update_all.to_numpy()
-                team2_np =df_team2_update_all.to_numpy()
+                # 7 game CONDITION #
+                team1_np =df_team1_update_7.to_numpy()
+                team2_np =df_team2_update_7.to_numpy()
         
                 diff = [a - b for a, b in zip(team1_np, team2_np)]
                 arr = np.array(diff)
@@ -210,11 +210,11 @@ class marchMad:
                 nx, ny = arr.shape
                 final_vector2 = arr.reshape((1,nx*ny))
                 
-                cols = df_team1_update_all.columns
+                cols = df_team2_update_7.columns
                 final_vect_df1 = pd.DataFrame(final_vector, columns = cols)
                 final_vect_df2 = pd.DataFrame(final_vector2, columns = cols)
-                proba_team1_all = self.model_save.predict_proba(final_vect_df1)
-                proba_team2_all = self.model_save.predict_proba(final_vect_df2)
+                proba_team1_7 = self.model_save.predict_proba(final_vect_df1)
+                proba_team2_7 = self.model_save.predict_proba(final_vect_df2)
                 
                 # 3 CONDITION #
                 team1_np =df_team1_update_3.to_numpy()
@@ -275,10 +275,10 @@ class marchMad:
                 final_vect_df2 = pd.DataFrame(final_vector2, columns = cols)
                 proba_team1_15 = self.model_save.predict_proba(final_vect_df1)
                 proba_team2_15 = self.model_save.predict_proba(final_vect_df2)
-                print('========================================================================================================')
-                print(f'Probability that {team_1} wins over 3 games is {proba_team1_3[0][1]}, 10 is {proba_team1_10[0][1]}, 15 is {proba_team1_15[0][1]}, all games is {proba_team1_all[0][1]}')
-                print(f'Probability that {team_2} wins over 3 games is {proba_team2_3[0][1]}, 10 is {proba_team2_10[0][1]}, 15 is {proba_team2_15[0][1]}, all games is {proba_team2_all[0][1]}')
-                print('========================================================================================================')
+                print('===================================================================================================================================================================')
+                print(f'Probability that {team_1} wins over 3 games is {proba_team1_3[0][1]}, 7 games is {proba_team1_7[0][1]}, 10 is {proba_team1_10[0][1]}, 15 is {proba_team1_15[0][1]}')
+                print(f'Probability that {team_2} wins over 3 games is {proba_team2_3[0][1]},  7 games is {proba_team2_7[0][1]}, 10 is {proba_team2_10[0][1]}, 15 is {proba_team2_15[0][1]}')
+                print('===================================================================================================================================================================')
             except Exception as e:
                 print(f'incorrect spelling of team names, reenter team neames: {e}')
 
