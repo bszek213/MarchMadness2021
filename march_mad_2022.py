@@ -138,7 +138,7 @@ class marchMad:
                 team_2 = input('team 2 input: ')
                 if team_2 == "exit":
                     break
-                game_input = input('number of games to look over (all or int input): ')
+                # game_input = input('number of games to look over (all or int input): ')
                 team1_str = 'https://www.sports-reference.com/cbb/schools/' + team_1 + '/2022-gamelogs.html' #self.args.team1.lower()
                 team2_str = 'https://www.sports-reference.com/cbb/schools/' + team_2 + '/2022-gamelogs.html' #self.args.team2.lower()
                 df_team1 = html_to_df_web_scrape(team1_str)
@@ -166,25 +166,39 @@ class marchMad:
                 # df_team1_update = df_team1_final_scale.drop(columns=self.drop_cols).iloc[-10:].median(axis = 0, skipna = True).to_frame().T
                 # df_team2_update = df_team2_final_scale.drop(columns=self.drop_cols).iloc[-10:].median(axis = 0, skipna = True).to_frame().T
                 ####################10 games seems to be the best###########
-                if game_input == 'all':
-                    df_team1_update = df_team1_final.drop(columns=self.drop_cols).median(axis = 0, skipna = True).to_frame().T
-                    df_team2_update = df_team2_final.drop(columns=self.drop_cols).median(axis = 0, skipna = True).to_frame().T
-                    df_final = df_team1_update.append(df_team2_update)
-                else:
-                    game_num = int(game_input) #int(self.args.games)
-                    df_team1_update = df_team1_final.drop(columns=self.drop_cols).iloc[-game_num:].median(axis = 0, skipna = True).to_frame().T
-                    df_team2_update = df_team2_final.drop(columns=self.drop_cols).iloc[-game_num:].median(axis = 0, skipna = True).to_frame().T
-                    df_final = df_team1_update.append(df_team2_update)
-                print(df_final)
+                # if game_input == 'all':
+                #ALL CONDITITION
+                df_team1_update_all = df_team1_final.drop(columns=self.drop_cols).median(axis = 0, skipna = True).to_frame().T
+                df_team2_update_all = df_team2_final.drop(columns=self.drop_cols).median(axis = 0, skipna = True).to_frame().T
+                df_final_all = df_team1_update_all.append(df_team2_update_all)
+                # else:
+                    # game_num = int(game_input) #int(self.args.games)
+                #HEAT INDEX - 3 games
+                df_team1_update_3 = df_team1_final.drop(columns=self.drop_cols).iloc[-3:].median(axis = 0, skipna = True).to_frame().T
+                df_team2_update_3 = df_team2_final.drop(columns=self.drop_cols).iloc[-3:].median(axis = 0, skipna = True).to_frame().T
+                df_final_3 = df_team1_update_3.append(df_team2_update_3)
                 
-                proba_team = self.model_save.predict_proba(df_final)
-                print('========================================================================================================')
-                print(f'probability of {team_1} winning is {float(proba_team[0][1])}, losing is {float(proba_team[0][0])}')
-                print(f'probability of {team_2} winning is {float(proba_team[1][1])}, losing is {float(proba_team[1][0])}')
-                print('========================================================================================================')
+                #10 games
+                df_team1_update_10 = df_team1_final.drop(columns=self.drop_cols).iloc[-10:].median(axis = 0, skipna = True).to_frame().T
+                df_team2_update_10 = df_team2_final.drop(columns=self.drop_cols).iloc[-10:].median(axis = 0, skipna = True).to_frame().T
+                df_final_10 = df_team1_update_10.append(df_team2_update_10)
                 
-                team1_np =df_team1_update.to_numpy()
-                team2_np =df_team2_update.to_numpy()
+                #15 games
+                df_team1_update_15 = df_team1_final.drop(columns=self.drop_cols).iloc[-15:].median(axis = 0, skipna = True).to_frame().T
+                df_team2_update_15 = df_team2_final.drop(columns=self.drop_cols).iloc[-15:].median(axis = 0, skipna = True).to_frame().T
+                df_final_15 = df_team1_update_15.append(df_team2_update_15)
+                
+                # proba_team_all = self.model_save.predict_proba(df_final_all)
+                # proba_team_3 = self.model_save.predict_proba(df_final_3)
+                # proba_team_10 = self.model_save.predict_proba(df_final_10)
+                # proba_team_15 = self.model_save.predict_proba(df_final_15)
+                # print('========================================================================================================')
+                # print(f'probability of {team_1} winning is {float(proba_team[0][1])}, losing is {float(proba_team[0][0])}')
+                # print(f'probability of {team_2} winning is {float(proba_team[1][1])}, losing is {float(proba_team[1][0])}')
+                # print('========================================================================================================')
+                # ALL CONDITION #
+                team1_np =df_team1_update_all.to_numpy()
+                team2_np =df_team2_update_all.to_numpy()
         
                 diff = [a - b for a, b in zip(team1_np, team2_np)]
                 arr = np.array(diff)
@@ -196,14 +210,74 @@ class marchMad:
                 nx, ny = arr.shape
                 final_vector2 = arr.reshape((1,nx*ny))
                 
-                cols = df_team1_update.columns
+                cols = df_team1_update_all.columns
                 final_vect_df1 = pd.DataFrame(final_vector, columns = cols)
                 final_vect_df2 = pd.DataFrame(final_vector2, columns = cols)
-                proba_team1 = self.model_save.predict_proba(final_vect_df1)
-                proba_team2 = self.model_save.predict_proba(final_vect_df2)
+                proba_team1_all = self.model_save.predict_proba(final_vect_df1)
+                proba_team2_all = self.model_save.predict_proba(final_vect_df2)
+                
+                # 3 CONDITION #
+                team1_np =df_team1_update_3.to_numpy()
+                team2_np =df_team2_update_3.to_numpy()
+        
+                diff = [a - b for a, b in zip(team1_np, team2_np)]
+                arr = np.array(diff)
+                nx, ny = arr.shape
+                final_vector = arr.reshape((1,nx*ny))
+                
+                diff = [b - a for a, b in zip(team1_np, team2_np)]
+                arr = np.array(diff)
+                nx, ny = arr.shape
+                final_vector2 = arr.reshape((1,nx*ny))
+                
+                cols = df_team1_update_3.columns
+                final_vect_df1 = pd.DataFrame(final_vector, columns = cols)
+                final_vect_df2 = pd.DataFrame(final_vector2, columns = cols)
+                proba_team1_3 = self.model_save.predict_proba(final_vect_df1)
+                proba_team2_3 = self.model_save.predict_proba(final_vect_df2)
+                
+                # 10 CONDITION #
+                team1_np =df_team1_update_10.to_numpy()
+                team2_np =df_team2_update_10.to_numpy()
+        
+                diff = [a - b for a, b in zip(team1_np, team2_np)]
+                arr = np.array(diff)
+                nx, ny = arr.shape
+                final_vector = arr.reshape((1,nx*ny))
+                
+                diff = [b - a for a, b in zip(team1_np, team2_np)]
+                arr = np.array(diff)
+                nx, ny = arr.shape
+                final_vector2 = arr.reshape((1,nx*ny))
+                
+                cols = df_team1_update_10.columns
+                final_vect_df1 = pd.DataFrame(final_vector, columns = cols)
+                final_vect_df2 = pd.DataFrame(final_vector2, columns = cols)
+                proba_team1_10 = self.model_save.predict_proba(final_vect_df1)
+                proba_team2_10 = self.model_save.predict_proba(final_vect_df2)
+                
+                # 15 CONDITION #
+                team1_np =df_team1_update_15.to_numpy()
+                team2_np =df_team2_update_15.to_numpy()
+        
+                diff = [a - b for a, b in zip(team1_np, team2_np)]
+                arr = np.array(diff)
+                nx, ny = arr.shape
+                final_vector = arr.reshape((1,nx*ny))
+                
+                diff = [b - a for a, b in zip(team1_np, team2_np)]
+                arr = np.array(diff)
+                nx, ny = arr.shape
+                final_vector2 = arr.reshape((1,nx*ny))
+                
+                cols = df_team1_update_15.columns
+                final_vect_df1 = pd.DataFrame(final_vector, columns = cols)
+                final_vect_df2 = pd.DataFrame(final_vector2, columns = cols)
+                proba_team1_15 = self.model_save.predict_proba(final_vect_df1)
+                proba_team2_15 = self.model_save.predict_proba(final_vect_df2)
                 print('========================================================================================================')
-                print('Probability that ' + team_1 + ' wins:', proba_team1[0][1])
-                print('Probability that ' + team_2 + ' wins:', proba_team2[0][1])
+                print(f'Probability that {team_1} wins over 3 games is {proba_team1_3[0][1]}, 10 is {proba_team1_10[0][1]}, 15 is {proba_team1_15[0][1]}, all games is {proba_team1_all[0][1]}')
+                print(f'Probability that {team_2} wins over 3 games is {proba_team2_3[0][1]}, 10 is {proba_team2_10[0][1]}, 15 is {proba_team2_15[0][1]}, all games is {proba_team2_all[0][1]}')
                 print('========================================================================================================')
             except Exception as e:
                 print(f'incorrect spelling of team names, reenter team neames: {e}')
