@@ -41,8 +41,9 @@ class marchMad:
         all_teams = Teams(year)
         team_names = all_teams.dataframes.abbreviation
         final_list = []
+        self.year_store = year
         for abv in team_names:
-            str_combine = 'https://www.sports-reference.com/cbb/schools/' + abv.lower() + '/2022-gamelogs.html'
+            str_combine = 'https://www.sports-reference.com/cbb/schools/' + abv.lower() + '/' + str(self.year_store) + '-gamelogs.html'
             print(f'current team: {abv}')
             df_inst = html_to_df_web_scrape(str_combine)
             final_list.append(df_inst)
@@ -139,8 +140,8 @@ class marchMad:
                 if team_2 == "exit":
                     break
                 # game_input = input('number of games to look over (all or int input): ')
-                team1_str = 'https://www.sports-reference.com/cbb/schools/' + team_1 + '/2022-gamelogs.html' #self.args.team1.lower()
-                team2_str = 'https://www.sports-reference.com/cbb/schools/' + team_2 + '/2022-gamelogs.html' #self.args.team2.lower()
+                team1_str = 'https://www.sports-reference.com/cbb/schools/' + team_1 +  '/' + str(self.year_store) + '-gamelogs.html' #self.args.team1.lower()
+                team2_str = 'https://www.sports-reference.com/cbb/schools/' + team_2 +  '/' + str(self.year_store) + '-gamelogs.html' #self.args.team2.lower()
                 df_team1 = html_to_df_web_scrape(team1_str)
                 df_team2 = html_to_df_web_scrape(team2_str)
                 
@@ -298,7 +299,7 @@ if __name__ == '__main__':
     start_time = time.time()
     mad = marchMad()
     mad.input_arg()
-    mad.get_teams(2022)
+    mad.get_teams(2021)
     mad.split()
     mad.machine()
     mad.compare_two_teams()
