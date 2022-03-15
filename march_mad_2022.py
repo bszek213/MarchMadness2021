@@ -170,6 +170,7 @@ class marchMad:
                 # df_team2_update = df_team2_final_scale.drop(columns=self.drop_cols).iloc[-10:].median(axis = 0, skipna = True).to_frame().T
                 ####################10 games seems to be the best###########
                 # if game_input == 'all':
+                self.drop_cols.append('game_result')
                 #7 game CONDITITION
                 df_team1_update_7 = df_team1_final.drop(columns=self.drop_cols).iloc[-7:].median(axis = 0, skipna = True).to_frame().T
                 df_team2_update_7 = df_team2_final.drop(columns=self.drop_cols).iloc[-7:].median(axis = 0, skipna = True).to_frame().T
