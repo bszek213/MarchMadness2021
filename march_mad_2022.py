@@ -310,7 +310,7 @@ if __name__ == '__main__':
     start_time = time.time()
     mad = marchMad()
     mad.input_arg()
-    mad.get_teams(2022)
+    mad.get_teams(2019)
     mad.split()
     mad.machine()
     mad.compare_two_teams()
