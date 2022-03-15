@@ -15,7 +15,7 @@ from sklearn.linear_model import LogisticRegression
 # from sklearn.gaussian_process import GaussianProcessClassifier
 # from sklearn.linear_model import Perceptron
 from sklearn.neural_network import MLPClassifier
-from sklearn.preprocessing import MinMaxScaler
+# from sklearn.preprocessing import MinMaxScaler
 # from sklearn.decomposition import PCA
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split#,RandomizedSearchCV
@@ -24,7 +24,8 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
-from sklearn.metrics import classification_report
+# from sklearn.metrics import classification_report
+import seaborn as sns
 
 class marchMad:
     def __init__(self):
@@ -295,23 +296,30 @@ class marchMad:
             plt.ylabel('Features')
             plt.title('NCAA MENS BASKETBALL')
             plt.savefig('feature_importances.png')
+            plt.close()
         # if self.name == 'MLPClass':
         #     feature_imp = pd.Series(np.abs(self.model_save.coefs_),index=self.x_test.columns).sort_values(ascending=False) #feature_importances_
     def correlate_analysis(self):
-        corr_matrix = self.x.astype(float).corr()
+        corr_matrix = np.abs(self.x.astype(float).corr())
         upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(np.bool))
         # Find features with correlation greater than 0.90
-        to_drop = [column for column in upper.columns if any(upper[column] > 0.85)]
+        to_drop = [column for column in upper.columns if any(upper[column] >= 0.80)]
         print('drop these:', to_drop)
         self.drop_cols = to_drop
         self.x_no_corr = self.x.drop(columns=to_drop)
+        top_corr_features = corr_matrix.index
+        plt.figure(figsize=(20,20))
+        #plot heat map
+        g=sns.heatmap(corr_matrix[top_corr_features],annot=True,cmap="RdYlGn")
+        plt.savefig('correlations.png')
+        plt.close()
         
 
 if __name__ == '__main__':
     start_time = time.time()
     mad = marchMad()
     mad.input_arg()
-    mad.get_teams(2019)
+    mad.get_teams(2022)
     mad.split()
     mad.machine()
     mad.compare_two_teams()
