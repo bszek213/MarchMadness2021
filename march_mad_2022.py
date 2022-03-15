@@ -59,9 +59,9 @@ class marchMad:
         self.all_data.to_csv('all_data.csv')
         
     def split(self):
-        self.drop_cols = ['game_result']#, 'fta', 'ft_pct', 'fga', 'opp_orb', 'orb', 'opp_fta', 'blk', 'opp_fg_pct']
+        #self.drop_cols = ['game_result']#, 'fta', 'ft_pct', 'fga', 'opp_orb', 'orb', 'opp_fta', 'blk', 'opp_fg_pct']
         self.y = self.all_data['game_result']
-        self.x = self.all_data.drop(columns=self.drop_cols)
+        self.x = self.all_data.drop(columns=['game_result'])
         self.correlate_analysis()
         # x_data = self.all_data.drop(columns=self.drop_cols)
         # scaler = MinMaxScaler()
@@ -302,6 +302,7 @@ class marchMad:
         # Find features with correlation greater than 0.90
         to_drop = [column for column in upper.columns if any(upper[column] > 0.85)]
         print('drop these:', to_drop)
+        self.drop_cols = to_drop
         self.x_no_corr = self.x.drop(columns=to_drop)
         
 
