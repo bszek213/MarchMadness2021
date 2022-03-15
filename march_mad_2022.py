@@ -300,7 +300,7 @@ class marchMad:
         corr_matrix = self.x.astype(float).corr()
         upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(np.bool))
         # Find features with correlation greater than 0.90
-        to_drop = [column for column in upper.columns if any(upper[column] > 0.90)]
+        to_drop = [column for column in upper.columns if any(upper[column] > 0.85)]
         print('drop these:', to_drop)
         self.x_no_corr = self.x.drop(columns=to_drop)
         
