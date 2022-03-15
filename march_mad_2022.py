@@ -40,6 +40,7 @@ class marchMad:
     def get_teams(self, year):
         all_teams = Teams(year)
         team_names = all_teams.dataframes.abbreviation
+        print(team_names)
         final_list = []
         self.year_store = year
         for abv in team_names:
@@ -58,15 +59,16 @@ class marchMad:
         self.all_data.to_csv('all_data.csv')
         
     def split(self):
-        self.drop_cols = ['game_result', 'fta', 'ft_pct', 'fga', 'opp_orb', 'orb', 'opp_fta', 'blk', 'opp_fg_pct']
-        y = self.all_data['game_result']
-        x = self.all_data.drop(columns=self.drop_cols)
+        self.drop_cols = ['game_result']#, 'fta', 'ft_pct', 'fga', 'opp_orb', 'orb', 'opp_fta', 'blk', 'opp_fg_pct']
+        self.y = self.all_data['game_result']
+        self.x = self.all_data.drop(columns=self.drop_cols)
+        self.correlate_analysis()
         # x_data = self.all_data.drop(columns=self.drop_cols)
         # scaler = MinMaxScaler()
         # scaled_data = scaler.fit_transform(x_data)
         # cols = x_data.columns
         # x = pd.DataFrame(scaled_data, columns = cols)
-        self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(x,y, train_size=0.8)
+        self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(self.x_no_corr,self.y, train_size=0.8)
 
     def machine(self):
         Gradclass = GradientBoostingClassifier()
@@ -294,12 +296,20 @@ class marchMad:
             plt.savefig('feature_importances.png')
         # if self.name == 'MLPClass':
         #     feature_imp = pd.Series(np.abs(self.model_save.coefs_),index=self.x_test.columns).sort_values(ascending=False) #feature_importances_
+    def correlate_analysis(self):
+        corr_matrix = self.x.astype(float).corr()
+        upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(np.bool))
+        # Find features with correlation greater than 0.90
+        to_drop = [column for column in upper.columns if any(upper[column] > 0.90)]
+        print('drop these:', to_drop)
+        self.x_no_corr = self.x.drop(columns=to_drop)
+        
 
 if __name__ == '__main__':
     start_time = time.time()
     mad = marchMad()
     mad.input_arg()
-    mad.get_teams(2021)
+    mad.get_teams(2022)
     mad.split()
     mad.machine()
     mad.compare_two_teams()
